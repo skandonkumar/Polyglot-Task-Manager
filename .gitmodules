@@ -1,3 +1,6 @@
 [submodule "task-service-java"]
 	path = task-service-java
 	url = https://github.com/skandonkumar/Task-Service-Java.git
+[submodule "task-service-node"]
+	path = task-service-node
+	url = https://github.com/skandonkumar/Task-Service-Node.git
