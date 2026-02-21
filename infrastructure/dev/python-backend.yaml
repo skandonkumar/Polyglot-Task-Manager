@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-backend-deployment
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-backend
+  template:
+    metadata:
+      labels:
+        app: python-backend
+    spec:
+      containers:
+        - name: python-backend
+          image: task-service-python:1.0.0
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 5000
+          env:
+          - name: POSTGRES_HOST
+            value: "postgres-service"
+          - name: REDIS_HOST
+            value: "redis-service"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-backend-service
+  namespace: dev
+spec:
+  selector:
+    app: python-backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
