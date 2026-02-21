@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-backend-deployment
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-backend
+  template:
+    metadata:
+      labels:
+        app: node-backend
+    spec:
+      containers:
+        - name: node-backend
+          image: task-service-node:1.0.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_HOST
+              value: "mongodb-service"
+            - name: REDIS_HOST
+              value: "redis-service"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: node-backend-service
+  namespace: dev
+spec:
+  selector:
+    app: node-backend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
