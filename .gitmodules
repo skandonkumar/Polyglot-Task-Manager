@@ -4,3 +4,6 @@
 [submodule "task-service-node"]
 	path = task-service-node
 	url = https://github.com/skandonkumar/Task-Service-Node.git
+[submodule "Task-Service-Python"]
+	path = Task-Service-Python
+	url = https://github.com/skandonkumar/Task-Service-Python.git
