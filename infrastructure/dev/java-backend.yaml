@@ -13,6 +13,10 @@ spec:
       labels:
         app: java-backend
     spec:
+      initContainers:
+      - name: wait-for-cassandra
+        image: busybox:1.28
+        command: ['sh', '-c', "until nc -z cassandra-service 9042; do echo 'Waiting for Cassandra...'; sleep 5; done;"]
       containers:
       - name: java-backend
         image: task-service-java:1.0.0

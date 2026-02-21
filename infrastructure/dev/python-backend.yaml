@@ -13,6 +13,10 @@ spec:
       labels:
         app: python-backend
     spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox:1.28
+        command: ['sh', '-c', "until nc -z postgres-service 5432; do echo 'Waiting for Postgres...'; sleep 2; done;"]
       containers:
         - name: python-backend
           image: task-service-python:1.0.0

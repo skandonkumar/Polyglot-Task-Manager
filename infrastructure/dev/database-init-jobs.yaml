@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cassandra-schema-job
+  namespace: dev
+spec:
+  # Delete the job automatically after a few minutes so it doesn't clutter the cluster
+  ttlSecondsAfterFinished: 120 
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: cassandra-init
+        image: cassandra:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            echo "Waiting for Cassandra to accept connections..."
+            until cqlsh cassandra-service -e "describe cluster"; do sleep 5; done;
+            echo "Creating Keyspace..."
+            cqlsh cassandra-service -e "CREATE KEYSPACE IF NOT EXISTS task_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};"
+            echo "Cassandra Schema Initialized."
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-schema-job
+  namespace: dev
+spec:
+  ttlSecondsAfterFinished: 120
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: postgres-init
+        image: postgres:15-alpine
+        env:
+        - name: PGPASSWORD
+          value: "postgres"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "Waiting for PostgreSQL to accept connections..."
+            until pg_isready -h postgres-service -U postgres; do sleep 2; done;
+            echo "Creating Tables..."
+            psql -h postgres-service -U postgres -d task_db -c "
+              CREATE TABLE IF NOT EXISTS tasks (
+                id VARCHAR(36) PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                description TEXT,
+                status VARCHAR(50) DEFAULT 'PENDING'
+              );"
+            echo "PostgreSQL Schema Initialized."

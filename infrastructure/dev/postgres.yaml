@@ -25,20 +25,6 @@ spec:
               value: "postgres"
             - name: POSTGRES_PASSWORD
               value: "postgres"
-    volumes:
-        - name: init-script
-          configMap:
-            name: postgres-init
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: postgres-init
-  namespace: dev
-data:
-  init.sql: |
-    CREATE DATABASE IF NOT EXISTS tasks_db;
 
 ---
 
